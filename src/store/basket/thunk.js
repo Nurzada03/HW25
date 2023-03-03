@@ -1,62 +1,56 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
+import {
+    addToBasketReq,
+    deleteBasketItemReq,
+    getBasketReq,
+    updateBasketItemReq,
+} from '../../api/mealService'
 import { fetchAPI } from '../../lib/fetchApi'
 
 export const getBasket = createAsyncThunk(
     'basket/getBasket',
     async (_, { rejectWithValue }) => {
         try {
-            const { data } = await fetchAPI('basket')
-            return data.items
+            const { data } = await getBasketReq()
+            return data.data.items
         } catch (error) {
             return rejectWithValue(error)
         }
     }
 )
-
 export const addToBasket = createAsyncThunk(
     'basket/addNewBasket',
     async (newItem, { dispatch, rejectWithValue }) => {
         try {
-            await fetchAPI(`foods/${newItem.id}/addToBasket`, {
-                method: 'POST',
-                body: { amount: newItem.amount },
-            })
-            return dispatch(getBasket())
+            await addToBasketReq(newItem)
+            dispatch(getBasket())
         } catch (error) {
-            return rejectWithValue(error)
+            rejectWithValue(error)
         }
     }
 )
-
 export const updateBasketItem = createAsyncThunk(
     'basket/updateBasket',
     async ({ id, amount }, { dispatch, rejectWithValue }) => {
         try {
-            await fetchAPI(`basketItem/${id}/update`, {
-                method: 'PUT',
-                body: { amount },
-            })
-            return dispatch(getBasket())
+            await updateBasketItemReq(id, amount)
+            dispatch(getBasket())
         } catch (error) {
-            return rejectWithValue(error)
+            rejectWithValue(error)
         }
     }
 )
-
 export const deleteBasketItem = createAsyncThunk(
     'basket/deleteBasket',
     async (id, { dispatch, rejectWithValue }) => {
         try {
-            await fetchAPI(`basketItem/${id}/delete`, {
-                method: 'DELETE',
-            })
-            return dispatch(getBasket())
+            await deleteBasketItemReq(id)
+            dispatch(getBasket())
         } catch (error) {
-            return rejectWithValue(error)
+            rejectWithValue(error)
         }
     }
 )
-
 export const submitOrder = createAsyncThunk(
     'basket/submitOrder',
     async ({ orderData }, { dispatch, rejectWithValue }) => {
